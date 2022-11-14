@@ -29,3 +29,39 @@ describe("GET /api/categories", () => {
       });
   });
 });
+
+describe("GET /api/reviews", () => {
+  test("200 : responds with an array of review objects containing correct properties", () => {
+    const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.reviews).toEqual(expect.any(Array));
+        expect(result.body.reviews.length).toBeGreaterThan(0);
+        result.body.reviews.forEach((review) => {
+          expect(review).toMatchObject({
+            owner: expect.any(String),
+            title: expect.any(String),
+            review_id: expect.any(Number),
+            category: expect.any(String),
+            review_img_url: expect.any(String),
+            created_at: expect.stringMatching(isoPattern),
+            votes: expect.any(Number),
+            designer: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200 : responds with the reviews sorted in descending date order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+});
