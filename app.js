@@ -6,8 +6,6 @@ const {
   getReviews,
 } = require("./controllers/reviews.controllers");
 
-app.use(express.json());
-
 app.get("/api/categories", getCategories);
 
 app.get("/api/reviews", getReviews);
