@@ -19,6 +19,7 @@ describe("GET /api/categories", () => {
       .expect(200)
       .then((result) => {
         expect(result.body.categories).toEqual(expect.any(Array));
+        expect(result.body.categories.length).toBeGreaterThan(0);
         result.body.categories.forEach((category) => {
           expect(category).toMatchObject({
             slug: expect.any(String),
