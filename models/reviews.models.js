@@ -82,6 +82,12 @@ exports.insertComment = (review_id, username, body) => {
     });
 };
 
+exports.selectUsers = () => {
+  return db.query("SELECT * FROM USERS;").then((result) => {
+    return result.rows;
+  });
+};
+
 exports.alterVotes = (review_id, inc_votes) => {
   if (!inc_votes || !/^-?[0-9]*$/.test(inc_votes)) {
     return Promise.reject({

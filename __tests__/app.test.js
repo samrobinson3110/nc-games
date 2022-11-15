@@ -244,6 +244,25 @@ describe("POST /api/reviews/:review_id/comments", () => {
   });
 });
 
+describe("GET /api/users", () => {
+  test("200 : responds with correct users object ", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.users).toEqual(expect.any(Array));
+        expect(result.body.users.length).toBeGreaterThan(0);
+        result.body.users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
+
 describe("PATCH /api/reviews/:review_id", () => {
   test("200 : responds with updated review object with votes increased", () => {
     const patchObject = {
