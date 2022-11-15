@@ -54,3 +54,30 @@ exports.selectCommentsByReviewId = (review_id) => {
       return result.rows;
     });
 };
+
+exports.insertComment = (review_id, username, body) => {
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      msg: "Incomplete comment",
+    });
+  }
+  return checkExists("reviews", "review_id", review_id)
+    .then(() => {
+      return checkExists("users", "username", username).then(() => {
+        return db.query(
+          `
+            INSERT INTO comments
+            (author, body, review_id)
+            VALUES
+            ($1, $2, $3)
+            RETURNING *;
+            `,
+          [username, body, review_id]
+        );
+      });
+    })
+    .then((result) => {
+      return result.rows[0];
+    });
+};
