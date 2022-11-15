@@ -4,6 +4,7 @@ const {
   selectReview,
   selectCommentsByReviewId,
   insertComment,
+  selectUsers,
 } = require("../models/reviews.models");
 
 exports.getCategories = (req, res, next) => {
@@ -42,6 +43,14 @@ exports.postComment = (req, res, next) => {
   insertComment(review_id, username, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => next(err));
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((users) => {
+      res.send({ users });
     })
     .catch((err) => next(err));
 };
