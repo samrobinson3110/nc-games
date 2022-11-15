@@ -75,13 +75,14 @@ describe("GET /api/reviews/:review_id", () => {
       .then((result) => {
         expect(result.body.review).toMatchObject({
           review_id: 2,
-          title: expect.any(String),
-          review_body: expect.any(String),
-          designer: expect.any(String),
-          review_img_url: expect.any(String),
-          votes: expect.any(Number),
-          category: expect.any(String),
-          owner: expect.any(String),
+          title: "Jenga",
+          review_body: "Fiddly fun for all the family",
+          designer: "Leslie Scott",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          votes: 5,
+          category: "dexterity",
+          owner: "philippaclaire9",
           created_at: expect.stringMatching(isoPattern),
         });
       });
