@@ -160,3 +160,86 @@ describe("GET /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("201 : responds with posted comment", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "Very good game!",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((result) => {
+        expect(result.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          author: "mallionaire",
+          body: "Very good game!",
+        });
+      });
+  });
+  test("400 : responds with error when invalid review_id is input", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "Very good game!",
+    };
+    return request(app)
+      .post("/api/reviews/one/comments")
+      .send(newComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Bad Request");
+      });
+  });
+  test("404 : responds with error when valid but non-existent review_id input", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "Very good game!",
+    };
+    return request(app)
+      .post("/api/reviews/9999/comments")
+      .send(newComment)
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe("Resource not found");
+      });
+  });
+  test("400 : responds with error when comment is incomplete (no body)", () => {
+    let invalidComment = {
+      username: "mallionaire",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(invalidComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Incomplete comment");
+      });
+  });
+  test("400 : responds with error when comment is incomplete (no username)", () => {
+    let invalidComment = {
+      body: "This is a comment",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(invalidComment)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Incomplete comment");
+      });
+  });
+  test("404 : responds with error when comment username is non-existent", () => {
+    const newComment = {
+      username: "non-existent",
+      body: "Very good game!",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe("Resource not found");
+      });
+  });
+});
