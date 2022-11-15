@@ -104,3 +104,59 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("200 : responds with array of comments with correct properties ", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.comments).toEqual(expect.any(Array));
+        expect(result.body.comments.length).toBeGreaterThan(0);
+        result.body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            review_id: 2,
+            created_at: expect.stringMatching(isoPattern),
+            body: expect.any(String),
+            author: expect.any(String),
+          });
+        });
+      });
+  });
+  test("200 : responds with comments sorted by date descending", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("200 : responds with empty array for review with no comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.comments).toEqual([]);
+      });
+  });
+  test("400 : responds with error when invalid review_id is input", () => {
+    return request(app)
+      .get("/api/reviews/one/comments")
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Bad Request");
+      });
+  });
+  test("404 : responds with error when valid but non-existent review_id is input ", () => {
+    return request(app)
+      .get("/api/reviews/9999/comments")
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe("Resource not found");
+      });
+  });
+});
