@@ -4,6 +4,7 @@ const {
   selectReview,
   selectCommentsByReviewId,
   insertComment,
+  alterVotes,
   selectUsers,
 } = require("../models/reviews.models");
 
@@ -43,6 +44,16 @@ exports.postComment = (req, res, next) => {
   insertComment(review_id, username, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => next(err));
+};
+
+exports.patchReview = (req, res, next) => {
+  const { review_id } = req.params;
+  const { inc_votes } = req.body;
+  alterVotes(review_id, inc_votes)
+    .then((review) => {
+      res.send({ review });
     })
     .catch((err) => next(err));
 };

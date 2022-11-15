@@ -8,6 +8,7 @@ const {
   getCommentsByReviewId,
   postComment,
   getUsers,
+  patchReview,
 } = require("./controllers/reviews.controllers");
 
 app.use(express.json());
@@ -23,6 +24,8 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.post("/api/reviews/:review_id/comments", postComment);
 
 app.get("/api/users", getUsers);
+
+app.patch("/api/reviews/:review_id", patchReview);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {

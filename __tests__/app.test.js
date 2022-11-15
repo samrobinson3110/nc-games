@@ -262,3 +262,100 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("PATCH /api/reviews/:review_id", () => {
+  test("200 : responds with updated review object with votes increased", () => {
+    const patchObject = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/reviews/2")
+      .send(patchObject)
+      .expect(200)
+      .then((result) => {
+        expect(result.body.review).toMatchObject({
+          review_id: 2,
+          title: "Jenga",
+          review_body: "Fiddly fun for all the family",
+          designer: "Leslie Scott",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          votes: 6,
+          category: "dexterity",
+          owner: "philippaclaire9",
+          created_at: expect.stringMatching(isoPattern),
+        });
+      });
+  });
+  test("200 : responds with updated review object with votes decreased", () => {
+    const patchObject = {
+      inc_votes: -10,
+    };
+    return request(app)
+      .patch("/api/reviews/2")
+      .send(patchObject)
+      .expect(200)
+      .then((result) => {
+        expect(result.body.review).toMatchObject({
+          review_id: 2,
+          title: "Jenga",
+          review_body: "Fiddly fun for all the family",
+          designer: "Leslie Scott",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          votes: -5,
+          category: "dexterity",
+          owner: "philippaclaire9",
+          created_at: expect.stringMatching(isoPattern),
+        });
+      });
+  });
+  test("400 : responds with error when review_id is invalid", () => {
+    const patchObject = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/reviews/two")
+      .send(patchObject)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Bad Request");
+      });
+  });
+  test("404 : responds with error when review_id is valid but non-existent", () => {
+    const patchObject = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/reviews/9999")
+      .send(patchObject)
+      .expect(404)
+      .then((result) => {
+        expect(result.body.msg).toBe("Resource not found");
+      });
+  });
+  test("400 : responds with error when input object has no inc_votes property", () => {
+    const patchObject = {
+      name: 1,
+    };
+    return request(app)
+      .patch("/api/reviews/1")
+      .send(patchObject)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Invalid patch object");
+      });
+  });
+  test("400 : responds with error when inc_votes value is invalid", () => {
+    const patchObject = {
+      inc_votes: "one",
+    };
+    return request(app)
+      .patch("/api/reviews/1")
+      .send(patchObject)
+      .expect(400)
+      .then((result) => {
+        expect(result.body.msg).toBe("Invalid patch object");
+      });
+  });
+});

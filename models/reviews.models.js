@@ -87,3 +87,27 @@ exports.selectUsers = () => {
     return result.rows;
   });
 };
+
+exports.alterVotes = (review_id, inc_votes) => {
+  if (!inc_votes || !/^-?[0-9]*$/.test(inc_votes)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid patch object",
+    });
+  }
+
+  return checkExists("reviews", "review_id", review_id)
+    .then(() => {
+      return db.query(
+        `
+              UPDATE reviews SET votes = $1 + (SELECT votes FROM reviews WHERE review_id = $2)
+              WHERE review_id = $2 
+              RETURNING *;
+          `,
+        [inc_votes, review_id]
+      );
+    })
+    .then((result) => {
+      return result.rows[0];
+    });
+};
