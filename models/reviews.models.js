@@ -92,24 +92,14 @@ exports.alterVotes = (review_id, inc_votes) => {
 
   return checkExists("reviews", "review_id", review_id)
     .then(() => {
-      return db
-        .query(
-          `
-          SELECT votes FROM reviews WHERE review_id = $1;
-          `,
-          [review_id]
-        )
-        .then((result) => {
-          const newVotes = result.rows[0].votes + inc_votes;
-          return db.query(
-            `
-              UPDATE reviews SET votes = $1
+      return db.query(
+        `
+              UPDATE reviews SET votes = $1 + (SELECT votes FROM reviews WHERE review_id = $2)
               WHERE review_id = $2 
               RETURNING *;
           `,
-            [newVotes, review_id]
-          );
-        });
+        [inc_votes, review_id]
+      );
     })
     .then((result) => {
       return result.rows[0];
