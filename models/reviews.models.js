@@ -25,7 +25,10 @@ exports.selectReview = (review_id) => {
   return db
     .query(
       `
-    SELECT * FROM reviews WHERE review_id = $1
+      SELECT reviews.owner, reviews.review_id, title, review_body, category, designer, review_img_url, reviews.votes, reviews.created_at, CAST(COUNT(comments.review_id) AS int) AS comment_count FROM reviews
+      LEFT JOIN comments on reviews.review_id = comments.review_id
+      WHERE reviews.review_id = $1
+      GROUP BY reviews.review_id;
     `,
       [review_id]
     )
