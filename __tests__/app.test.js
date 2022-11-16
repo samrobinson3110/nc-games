@@ -65,6 +65,95 @@ describe("GET /api/reviews", () => {
         });
       });
   });
+  describe("Query tests", () => {
+    test("200 : responds with reviews filtered by category", () => {
+      return request(app)
+        .get("/api/reviews?category=dexterity")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual(expect.any(Array));
+          expect(result.body.reviews.length).toBeGreaterThan(0);
+          result.body.reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              category: "dexterity",
+            });
+          });
+        });
+    });
+    test("200 : responds with reviews sorted by column", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=votes")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual(expect.any(Array));
+          expect(result.body.reviews.length).toBeGreaterThan(0);
+          expect(result.body.reviews).toBeSortedBy("votes", {
+            descending: true,
+          });
+        });
+    });
+    test("200 : responds with reviews ordered by order", () => {
+      return request(app)
+        .get("/api/reviews?order=asc")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual(expect.any(Array));
+          expect(result.body.reviews.length).toBeGreaterThan(0);
+          expect(result.body.reviews).toBeSortedBy("created_at");
+        });
+    });
+    test("200 : responds with reviews following multiple queries", () => {
+      return request(app)
+        .get("/api/reviews?order=asc&sort_by=votes&category=social deduction")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual(expect.any(Array));
+          expect(result.body.reviews.length).toBeGreaterThan(0);
+          expect(result.body.reviews).toBeSortedBy("votes");
+          result.body.reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              category: "social deduction",
+            });
+          });
+        });
+    });
+    test("400 : responds with an error if client tries to filter by a non-existent category", () => {
+      return request(app)
+        .get("/api/reviews?category=not_there")
+        .expect(400)
+        .then((result) => {
+          expect(result.body.msg).toBe("Bad Request");
+        });
+    });
+    test("200 : responds with reviews sorted by date if client tries to sort by a non-existent column", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=not_there")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("200 : responds with reviews ordered by descending value if client tries to order by something other than asc/desc", () => {
+      return request(app)
+        .get("/api/reviews?order=not_there&sort_by=title")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toBeSortedBy("title", {
+            descending: true,
+          });
+        });
+    });
+    test("200 : responds with an empty array for a valid category with no reviews", () => {
+      return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual([]);
+        });
+    });
+  });
 });
 
 describe("GET /api/reviews/:review_id", () => {
