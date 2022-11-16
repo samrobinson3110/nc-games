@@ -82,12 +82,12 @@ describe("GET /api/reviews", () => {
     });
     test("200 : responds with reviews sorted by column", () => {
       return request(app)
-        .get("/api/reviews?sort_by=title")
+        .get("/api/reviews?sort_by=votes")
         .expect(200)
         .then((result) => {
           expect(result.body.reviews).toEqual(expect.any(Array));
           expect(result.body.reviews.length).toBeGreaterThan(0);
-          expect(result.body.reviews).toBeSortedBy("title", {
+          expect(result.body.reviews).toBeSortedBy("votes", {
             descending: true,
           });
         });
