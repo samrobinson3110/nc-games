@@ -145,6 +145,14 @@ describe("GET /api/reviews", () => {
           });
         });
     });
+    test("200 : responds with an empty array for a valid category with no reviews", () => {
+      return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .then((result) => {
+          expect(result.body.reviews).toEqual([]);
+        });
+    });
   });
 });
 
