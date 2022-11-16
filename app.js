@@ -9,6 +9,7 @@ const {
   postComment,
   getUsers,
   patchReview,
+  deleteComment,
 } = require("./controllers/reviews.controllers");
 
 app.use(express.json());
@@ -26,6 +27,8 @@ app.post("/api/reviews/:review_id/comments", postComment);
 app.get("/api/users", getUsers);
 
 app.patch("/api/reviews/:review_id", patchReview);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {

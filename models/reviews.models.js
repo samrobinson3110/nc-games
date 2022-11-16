@@ -114,3 +114,23 @@ exports.alterVotes = (review_id, inc_votes) => {
       return result.rows[0];
     });
 };
+
+exports.removeComment = (comment_id) => {
+  if (!/^[0-9]*$/.test(comment_id)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request",
+    });
+  }
+  return db
+    .query(
+      `DELETE FROM comments
+    WHERE comment_id = ${comment_id}
+    RETURNING *`
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "comment_id not found" });
+      }
+    });
+};
