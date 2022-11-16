@@ -184,6 +184,28 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.body.msg).toBe("review_id not found");
       });
   });
+  test("200 : response object contains comment_count = 0 when no comments exist", () => {
+    return request(app)
+      .get("/api/reviews/1")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.review).toMatchObject({
+          review_id: 1,
+          comment_count: 0,
+        });
+      });
+  });
+  test("200 : response object contains comment_count > 0 when comments exist", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.review).toMatchObject({
+          review_id: 2,
+          comment_count: 3,
+        });
+      });
+  });
 });
 
 describe("GET /api/reviews/:review_id/comments", () => {
