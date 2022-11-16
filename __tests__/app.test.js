@@ -470,3 +470,30 @@ describe("PATCH /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204 : responds with error containing no body", () => {
+    return request(app)
+      .delete("/api/comments/3")
+      .expect(204)
+      .then((result) => {
+        expect(result.body).toEqual({});
+      });
+  });
+  test("400 : responds with error for invalid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/three")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad Request");
+      });
+  });
+  test("404 : responds with error when comment_id does not exist", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("comment_id not found");
+      });
+  });
+});
