@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const format = require("pg-format");
 const { checkExists } = require("../db/utils");
 exports.selectCategories = () => {
   return db.query("SELECT * FROM categories;").then((result) => {
@@ -6,19 +7,53 @@ exports.selectCategories = () => {
   });
 };
 
-exports.selectReviews = () => {
-  return db
+exports.selectReviews = (sort_by = "created_at", order = "desc", category) => {
+  order = order.toUpperCase();
+  if (order !== "ASC") {
+    order = "DESC";
+  }
+
+  const getCategories = this.selectCategories();
+  const getColumns = db
     .query(
-      `
-      SELECT owner, reviews.review_id, title, category, designer, review_img_url, reviews.votes, reviews.created_at, CAST(COUNT(*) AS int) AS comment_count FROM reviews
-      LEFT JOIN comments on reviews.review_id = comments.review_id
-      GROUP BY reviews.review_id
-      ORDER BY created_at DESC;
-  `
+      `SELECT *
+  from INFORMATION_SCHEMA.COLUMNS
+  where TABLE_NAME='reviews'`
     )
     .then((result) => {
       return result.rows;
     });
+
+  return Promise.all([getCategories, getColumns]).then((values) => {
+    const categories = values[0].map((value) => value.slug);
+    const columns = values[1].map((value) => value.column_name);
+
+    if (!columns.includes(sort_by)) {
+      sort_by = "created_at";
+    }
+
+    let queryStr = `SELECT owner, reviews.review_id, title, category, designer, review_img_url, reviews.votes, reviews.created_at, CAST(COUNT(*) AS int) AS comment_count FROM reviews
+      LEFT JOIN comments on reviews.review_id = comments.review_id`;
+
+    if (category) {
+      if (!categories.includes(category)) {
+        return Promise.reject({
+          status: 400,
+          msg: "Bad Request",
+        });
+      }
+      queryStr = format(`${queryStr} WHERE category = %L`, [category]);
+    }
+
+    queryStr = format(
+      `${queryStr} GROUP BY reviews.review_id ORDER BY %I ${order};`,
+      [sort_by]
+    );
+
+    return db.query(queryStr).then((result) => {
+      return result.rows;
+    });
+  });
 };
 
 exports.selectReview = (review_id) => {
