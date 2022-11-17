@@ -8,6 +8,7 @@ const {
   selectUsers,
   removeComment,
 } = require("../models/reviews.models");
+const { readFile } = require("fs/promises");
 
 exports.getCategories = (req, res, next) => {
   selectCategories().then((categories) => {
@@ -75,6 +76,14 @@ exports.deleteComment = (req, res, next) => {
   removeComment(comment_id)
     .then(() => {
       res.status(204).end();
+    })
+    .catch((err) => next(err));
+};
+
+exports.getAPIs = (req, res, next) => {
+  readFile("./endpoints.json", "utf-8")
+    .then((result) => {
+      res.send(JSON.parse(result));
     })
     .catch((err) => next(err));
 };
