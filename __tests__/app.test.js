@@ -497,3 +497,24 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("GET /api", () => {
+  test("200 : responds with an object containing all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((result) => {
+        expect(result.body).toMatchObject({
+          "GET /api": expect.any(Object),
+          "GET /api/categories": expect.any(Object),
+          "GET /api/reviews": expect.any(Object),
+          "GET /api/reviews/:review_id": expect.any(Object),
+          "GET /api/reviews/:review_id/comments": expect.any(Object),
+          "POST /api/reviews/:review_id/comments": expect.any(Object),
+          "PATCH /api/reviews/:review_id": expect.any(Object),
+          "GET /api/users": expect.any(Object),
+          "DELETE /api/comments/:comment_id": expect.any(Object),
+        });
+      });
+  });
+});

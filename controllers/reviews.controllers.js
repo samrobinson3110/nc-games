@@ -7,6 +7,7 @@ const {
   alterVotes,
   selectUsers,
   removeComment,
+  selectAPIs,
 } = require("../models/reviews.models");
 
 exports.getCategories = (req, res, next) => {
@@ -77,4 +78,10 @@ exports.deleteComment = (req, res, next) => {
       res.status(204).end();
     })
     .catch((err) => next(err));
+};
+
+exports.getAPIs = (req, res, next) => {
+  selectAPIs().then((response) => {
+    res.send(response);
+  });
 };
