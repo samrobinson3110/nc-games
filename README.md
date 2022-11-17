@@ -2,7 +2,7 @@
 
 ## Hosting
 
-The hosted version of the project can be found [here](https://www.google.com)
+The hosted version of the project can be found [here](https://worried-deer-jacket.cyclic.app)
 
 ## Project Summary
 
