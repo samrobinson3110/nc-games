@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { readFile } = require("fs/promises");
 const format = require("pg-format");
 const { checkExists } = require("../db/utils");
 exports.selectCategories = () => {
@@ -169,12 +168,4 @@ exports.removeComment = (comment_id) => {
         return Promise.reject({ status: 404, msg: "comment_id not found" });
       }
     });
-};
-
-exports.selectAPIs = () => {
-  return readFile("./endpoints.json", "utf-8")
-    .then((result) => {
-      return JSON.parse(result);
-    })
-    .catch((err) => console.log(err));
 };

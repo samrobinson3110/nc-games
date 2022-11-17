@@ -7,8 +7,8 @@ const {
   alterVotes,
   selectUsers,
   removeComment,
-  selectAPIs,
 } = require("../models/reviews.models");
+const { readFile } = require("fs/promises");
 
 exports.getCategories = (req, res, next) => {
   selectCategories().then((categories) => {
@@ -81,7 +81,9 @@ exports.deleteComment = (req, res, next) => {
 };
 
 exports.getAPIs = (req, res, next) => {
-  selectAPIs().then((response) => {
-    res.send(response);
-  });
+  readFile("./endpoints.json", "utf-8")
+    .then((result) => {
+      res.send(JSON.parse(result));
+    })
+    .catch((err) => next(err));
 };
